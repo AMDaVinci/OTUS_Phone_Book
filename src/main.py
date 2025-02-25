@@ -1,4 +1,4 @@
-import json
+import json, time
 from pprint import pprint
 from pathlib import Path
 
@@ -38,10 +38,43 @@ def open_file():
     while not Path(file_path).exists() and str(file_path)[-5:-1] != 'json':
         file_path = input('Please provide CORRECT file path to your json:')
     with open(file_path, 'r', encoding='UTF-8') as contacts_file:
-        file_dict = json.load(contacts_file)
+        file_data_list = json.load(contacts_file)
     print('\n Phone Book is opened successfully\n')
-    return file_dict
+    return file_data_list
 
+def show_all_contacts():
+    for item in buffer_list:
+        for i in item:
+            if isinstance(item[i], dict):
+                print(f'{i}:')
+                for key, value in item[i].items():
+                    print(f'    {key}: {value}')
+                    time.sleep(0.15)
+            else:
+                print(f'{i}: {item[i]}')
+            time.sleep(0.4)
+        print('\n')
+    while input('Press "P" to continue...').lower() != 'p':
+        pass #Review of Phone Book, required due to visual size
+
+def create_new_contact():
+    print('Creating new contact...')
+    # print(buffer_list[0])
+    new_contact_dict = {}
+    for key, value in buffer_list[0].items():
+        # print(type(value))
+        if key == 'ID':
+            new_contact_dict[key] = f'{int(max([_['ID'] for _ in buffer_list])) + 1:0>5}'
+            print(f'ID: {new_contact_dict['ID']}')
+        elif isinstance(value, dict):
+            nc_phone_dict = {}
+            for k in value.keys():
+                nc_phone_dict[k] = input(f'Enter {k} {key}: ')
+            new_contact_dict[key] = nc_phone_dict
+        else:
+            new_contact_dict[key] = input(f'Enter {key}: ')
+    buffer_list.append(new_contact_dict)
+    print('New contact has been created successfully\n')
 
 phone_book_menu()
 menu_selected  = menu_selection()
@@ -49,13 +82,14 @@ menu_selected  = menu_selection()
 
 while menu_selected != len(menu_list):
     if menu_selected == 1:
-        buffer_dict = open_file()
+        buffer_list = open_file()
         phone_book_menu()
         menu_selected = menu_selection()
     elif  menu_selected == 2:
-        for item in buffer_dict:
-            pprint(item, sort_dicts=False, compact=True)
-        while input('Press any key to continue...') == '':
-            pass #Review of Phone Book, required due to visual size
+        show_all_contacts()
+        phone_book_menu()
+        menu_selected = menu_selection()
+    elif menu_selected == 3:
+        create_new_contact()
         phone_book_menu()
         menu_selected = menu_selection()
