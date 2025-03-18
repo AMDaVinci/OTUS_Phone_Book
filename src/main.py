@@ -160,4 +160,3 @@ while menu_selected != len(menu_list):
         with open('Contacts.json', 'w', encoding='UTF-8') as contacts_file:
             json.dump(buffer_list, contacts_file, ensure_ascii=False, indent=4)
         print('Changes saved successfully\n')
-        break
