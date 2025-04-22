@@ -1,10 +1,6 @@
 import json, time
-from pprint import pprint
 from pathlib import Path
 
-from src.initial_file_creator.main import initial_dict
-
-#C:\Users\AMakarov5.000\Desktop\Phone_Book\src\initial_file_creator\Contacts.json
 
 menu_list = [
         'Open File',
@@ -49,16 +45,17 @@ def proceed_input():
         pass #Review of Phone Book, required due to visual size
 
 def path_request():
+    print('\033[1mPlease note that only JSON file is allowed for input \033[0m\n')
     file_path = input('Please provide full file path to your json:')
-    while not Path(file_path).exists() and str(file_path)[-5:-1] != 'json':
+    while file_path == '' or not Path(file_path).exists() and str(file_path)[-5:-1] != 'json':
         file_path = input('Please provide CORRECT file path to your json:')
     return file_path
 
-def open_file(file_path):
-    print('\033[1m Please note that only JSON file is allowed for input \033[0m\n')
+def open_file(file_path, menu_selection):
     with open(file_path, 'r', encoding='UTF-8') as contacts_file:
         file_data_list = json.load(contacts_file)
-    print('\n Phone Book is opened successfully\n')
+    if menu_selection == 1:
+        print('\n Phone Book is opened successfully\n')
     return file_data_list
 
 def show_all_contacts():
@@ -126,17 +123,17 @@ def delete_contact(work_list: list):
     for item in work_list:
         if int(item['ID']) == int(delete_contact_id):
             work_list.remove(item)
-            print('Contact has been deleted successfully\n')
-    else:
-        return print('Contact ID not found\n')
+        return print('Contact has been deleted successfully\n')
+    return print('Contact ID not found\n')
 
 def save_changes(work_list: list, initial_list: list ):
-    if work_list == initial_dict:
+    if work_list == initial_list:
         print('Initial file was not changed')
     else:
+        print('File will be saved in the project directory\n')
         with open('Contacts.json', 'w', encoding='UTF-8') as contacts_file:
             json.dump(work_list, contacts_file, ensure_ascii=False, indent=4)
-        print('Changes saved successfully\n', f'Press {len(menu_list)} for exit')
+        print('Changes saved successfully\n',f'\nPress {len(menu_list)} for exit or choose another option')
 
 phone_book_menu()
 menu_selected  = menu_selection()
@@ -146,12 +143,11 @@ menu_selected  = menu_selection()
 while menu_selected != len(menu_list):
     if menu_selected == 1:
         path_to_file = path_request()
-        buffer_list = open_file(path_to_file)
+        buffer_list = open_file(path_to_file, menu_selected)
         phone_book_menu()
         menu_selected = menu_selection()
     elif  menu_selected == 2:
         show_all_contacts()
-        print([item.get('ID') for item in buffer_list])
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 3:
@@ -171,7 +167,7 @@ while menu_selected != len(menu_list):
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 7:
-        initial_list = open_file(path_to_file)
+        initial_list = open_file(path_to_file, menu_selected)
         save_changes(buffer_list, initial_list)
         phone_book_menu()
         menu_selected = menu_selection()
