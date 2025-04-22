@@ -2,7 +2,7 @@ import json, time
 from pprint import pprint
 from pathlib import Path
 
-
+from src.initial_file_creator.main import initial_dict
 
 #C:\Users\AMakarov5.000\Desktop\Phone_Book\src\initial_file_creator\Contacts.json
 
@@ -32,7 +32,7 @@ def menu_selection():
     print(f'\nYou selected \033[91m\033[1m {menu_list[int(user_selection) - 1]} \033[0m\n',)
     return int(user_selection)
 
-def buffer_list_printing(item):
+def work_list_printing(item):
     for i in item:
         if isinstance(item[i], dict):
             print(f'{i}:')
@@ -42,14 +42,20 @@ def buffer_list_printing(item):
         else:
             print(f'{i}: {item[i]}')
         time.sleep(0.4)
-    print('\n')
+    print('')
 
+def proceed_input():
+    while input('Press "P" to continue...').lower() != 'p':
+        pass #Review of Phone Book, required due to visual size
 
-def open_file():
-    print('\033[1m Please note that only JSON file is allowed for input \033[0m\n')
+def path_request():
     file_path = input('Please provide full file path to your json:')
     while not Path(file_path).exists() and str(file_path)[-5:-1] != 'json':
         file_path = input('Please provide CORRECT file path to your json:')
+    return file_path
+
+def open_file(file_path):
+    print('\033[1m Please note that only JSON file is allowed for input \033[0m\n')
     with open(file_path, 'r', encoding='UTF-8') as contacts_file:
         file_data_list = json.load(contacts_file)
     print('\n Phone Book is opened successfully\n')
@@ -57,16 +63,15 @@ def open_file():
 
 def show_all_contacts():
     for item in buffer_list:
-        buffer_list_printing(item)
-    while input('Press "P" to continue...').lower() != 'p':
-        pass #Review of Phone Book, required due to visual size
+        work_list_printing(item)
+    proceed_input()
 
-def create_new_contact():
+def create_new_contact(work_list: list):
     print('Creating new contact...')
     new_contact_dict = {}
-    for key, value in buffer_list[0].items():
+    for key, value in work_list[0].items():
         if key == 'ID':
-            new_contact_dict[key] = f'{int(max([_['ID'] for _ in buffer_list])) + 1:0>5}'
+            new_contact_dict[key] = f'{int(max([_['ID'] for _ in work_list])) + 1:0>5}'
             print(f'ID: {new_contact_dict['ID']}')
         elif isinstance(value, dict):
             nc_phone_dict = {}
@@ -75,27 +80,25 @@ def create_new_contact():
             new_contact_dict[key] = nc_phone_dict
         else:
             new_contact_dict[key] = input(f'Enter {key}: ')
-    buffer_list.append(new_contact_dict)
+    work_list.append(new_contact_dict)
     print('New contact has been created successfully\n')
 
-def search_contact():
+def search_contact(work_list: list):
     print('Search for Contact...')
     search_input = input('Enter search string: ')
-    for item in buffer_list:
-        for key, value in item.items():
-            if search_input.lower() in str(value).lower():
-                buffer_list_printing(item)
-    while input('Press "P" to continue...').lower() != 'p':
-        pass #Review of Phone Book, required due to visual size
+    for item in work_list:
+        if search_input.lower() in str(item.values()).lower():
+            work_list_printing(item)
+    proceed_input()
 
 
-def edit_contact():
+def edit_contact(work_list: list):
     print('Editing contact...')
     edit_contact_id = input('Enter contact ID to edit: ')
     while not int(edit_contact_id):
         edit_contact_id = input('Please enter correct contact ID: ')
-    for item in buffer_list:
-        if int(item['ID']) == int(edit_contact_id):
+    for item in work_list:
+        if int(item.get('ID')) == int(edit_contact_id):
             for key, value in item.items():
                 if key == 'ID':
                     print(f'ID: {value}')
@@ -110,53 +113,65 @@ def edit_contact():
                     record_update = input(f'Enter new {key}: ')
                     if record_update:
                         item[key] = record_update
-            print('Contact has been edited successfully\n')
-        else:
-            return print('Contact ID not found\n')
+            return print('\n', 'Contact has been edited successfully\n')
+
+    return print('Contact ID not found\n')
 
 
-def delete_contact():
+def delete_contact(work_list: list):
     print('Deleting contact...')
-    delete_contact_id = input('Enter contact ID to delete: ')
+    delete_contact_id = input('Enter contact ID (as number) to delete: ')
     while not int(delete_contact_id):
         delete_contact_id = input('Please enter correct contact ID: ')
-    for item in buffer_list:
+    for item in work_list:
         if int(item['ID']) == int(delete_contact_id):
-            buffer_list.remove(item)
+            work_list.remove(item)
             print('Contact has been deleted successfully\n')
-        else:
-            return print('Contact ID not found\n')
+    else:
+        return print('Contact ID not found\n')
+
+def save_changes(work_list: list, initial_list: list ):
+    if work_list == initial_dict:
+        print('Initial file was not changed')
+    else:
+        with open('Contacts.json', 'w', encoding='UTF-8') as contacts_file:
+            json.dump(work_list, contacts_file, ensure_ascii=False, indent=4)
+        print('Changes saved successfully\n', f'Press {len(menu_list)} for exit')
 
 phone_book_menu()
 menu_selected  = menu_selection()
 
 
+
 while menu_selected != len(menu_list):
     if menu_selected == 1:
-        buffer_list = open_file()
+        path_to_file = path_request()
+        buffer_list = open_file(path_to_file)
         phone_book_menu()
         menu_selected = menu_selection()
     elif  menu_selected == 2:
         show_all_contacts()
+        print([item.get('ID') for item in buffer_list])
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 3:
-        create_new_contact()
+        create_new_contact(buffer_list)
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 4:
-        search_contact()
+        search_contact(buffer_list)
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 5:
-        edit_contact()
+        edit_contact(buffer_list)
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 6:
-        delete_contact()
+        delete_contact(buffer_list)
         phone_book_menu()
         menu_selected = menu_selection()
     elif menu_selected == 7:
-        with open('Contacts.json', 'w', encoding='UTF-8') as contacts_file:
-            json.dump(buffer_list, contacts_file, ensure_ascii=False, indent=4)
-        print('Changes saved successfully\n')
+        initial_list = open_file(path_to_file)
+        save_changes(buffer_list, initial_list)
+        phone_book_menu()
+        menu_selected = menu_selection()
