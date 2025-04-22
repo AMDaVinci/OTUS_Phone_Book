@@ -1,0 +1,38 @@
+[
+    {
+        "ID": "00001",
+        "First Name": "Alex",
+        "Last Name": "Smith",
+        "Age": 36,
+        "Phone Number": {
+            "Mobile": "+79172345678",
+            "Home": "",
+            "Work": ""
+        },
+        "Birthday": "01-Jan-1989"
+    },
+    {
+        "ID": "00002",
+        "First Name": "John",
+        "Last Name": "Smith",
+        "Age": 36,
+        "Phone Number": {
+            "Mobile": "+79172345678",
+            "Home": "",
+            "Work": ""
+        },
+        "Birthday": "01-Jan-1989"
+    },
+    {
+        "ID": "00003",
+        "First Name": "2",
+        "Last Name": "3",
+        "Age": "4",
+        "Phone Number": {
+            "Mobile": "5",
+            "Home": "6",
+            "Work": "7"
+        },
+        "Birthday": "8"
+    }
+]
