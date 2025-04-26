@@ -51,10 +51,10 @@ def path_request():
         file_path = input('Please provide CORRECT file path to your json:')
     return file_path
 
-def open_file(file_path, menu_selection):
+def open_file(file_path, menu_choice):
     with open(file_path, 'r', encoding='UTF-8') as contacts_file:
         file_data_list = json.load(contacts_file)
-    if menu_selection == 1:
+    if menu_choice == 1:
         print('\n Phone Book is opened successfully\n')
     return file_data_list
 
@@ -135,39 +135,40 @@ def save_changes(work_list: list, initial_list: list ):
             json.dump(work_list, contacts_file, ensure_ascii=False, indent=4)
         print('Changes saved successfully\n',f'\nPress {len(menu_list)} for exit or choose another option')
 
-phone_book_menu()
-menu_selected  = menu_selection()
 
+if __name__ == '__main__':
 
+    phone_book_menu()
+    menu_selected  = menu_selection()
 
-while menu_selected != len(menu_list):
-    if menu_selected == 1:
-        path_to_file = path_request()
-        buffer_list = open_file(path_to_file, menu_selected)
-        phone_book_menu()
-        menu_selected = menu_selection()
-    elif  menu_selected == 2:
-        show_all_contacts()
-        phone_book_menu()
-        menu_selected = menu_selection()
-    elif menu_selected == 3:
-        create_new_contact(buffer_list)
-        phone_book_menu()
-        menu_selected = menu_selection()
-    elif menu_selected == 4:
-        search_contact(buffer_list)
-        phone_book_menu()
-        menu_selected = menu_selection()
-    elif menu_selected == 5:
-        edit_contact(buffer_list)
-        phone_book_menu()
-        menu_selected = menu_selection()
-    elif menu_selected == 6:
-        delete_contact(buffer_list)
-        phone_book_menu()
-        menu_selected = menu_selection()
-    elif menu_selected == 7:
-        initial_list = open_file(path_to_file, menu_selected)
-        save_changes(buffer_list, initial_list)
-        phone_book_menu()
-        menu_selected = menu_selection()
+    while menu_selected != len(menu_list):
+        if menu_selected == 1:
+            path_to_file = path_request()
+            buffer_list = open_file(path_to_file, menu_selected)
+            phone_book_menu()
+            menu_selected = menu_selection()
+        elif  menu_selected == 2:
+            show_all_contacts()
+            phone_book_menu()
+            menu_selected = menu_selection()
+        elif menu_selected == 3:
+            create_new_contact(buffer_list)
+            phone_book_menu()
+            menu_selected = menu_selection()
+        elif menu_selected == 4:
+            search_contact(buffer_list)
+            phone_book_menu()
+            menu_selected = menu_selection()
+        elif menu_selected == 5:
+            edit_contact(buffer_list)
+            phone_book_menu()
+            menu_selected = menu_selection()
+        elif menu_selected == 6:
+            delete_contact(buffer_list)
+            phone_book_menu()
+            menu_selected = menu_selection()
+        elif menu_selected == 7:
+            initial_list = open_file(path_to_file, menu_selected)
+            save_changes(buffer_list, initial_list)
+            phone_book_menu()
+            menu_selected = menu_selection()
